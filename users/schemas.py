@@ -8,5 +8,10 @@ class UserCreate(BaseModel):
     password: str
 
 
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+
+
 class TokenData(BaseModel):
     id: Optional[str] = None

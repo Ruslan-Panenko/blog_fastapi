@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from posts import models
 from posts.schemas import Post
+from users import auth
 
 now = datetime.datetime.now()
 current_date = now.strftime("%Y-%m-%d")
@@ -20,14 +21,15 @@ all_articles = newsapi.get_everything(q='ukraine',
 
 
 @router.post('/',)
-async def create_post(db: Session = Depends(get_db)):
+async def create_post(db: Session = Depends(get_db), current_user: int = Depends(auth.get_current_user)):
     all_posts = db.query(models.Post.title).all()
 
     posts = []
     for i in all_posts:
         posts.append(i.title)
     for post in all_articles['articles']:
-        new_post = models.Post(title=post['title'], content=post['content'], published=True)
+        new_post = models.Post(title=post['title'], content=post['content'], published=True,
+                               owner_id=current_user)
         if new_post.title not in posts:
 
             db.add(new_post)
